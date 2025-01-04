@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Storage;
 
 class ArticleTwoController extends Controller
 {
-    
+
     public function index()
     {
         $data = [
-            'title'=>'Article list',
-            'articles'=>Article::with('category')->where('article_number', 2)->get()
+            'title' => 'Article list',
+            'articles' => Article::with('category')->where('article_number', 2)->get()
         ];
-        return view('admin.articles2.index',$data);
+        return view('admin.articles2.index', $data);
     }
 
     /**
@@ -27,10 +27,10 @@ class ArticleTwoController extends Controller
     public function create()
     {
         $data = [
-            'title'=>'Article create',
-            'categories'=>Category::get()
+            'title' => 'Article create',
+            'categories' => Category::get()
         ];
-        return view('admin.articles2.create',$data);
+        return view('admin.articles2.create', $data);
     }
 
     /**
@@ -40,10 +40,10 @@ class ArticleTwoController extends Controller
     {
 
         $request->validate([
-            'title'=>'required',
-            'isi'=>'required',
-            'gambar'=>'image|mimes:jpg,png,bmp,jpeg,webp',
-            'category_id'=>'required'
+            'title' => 'required',
+            'isi' => 'required',
+            'gambar' => 'image|mimes:jpg,png,bmp,jpeg,webp',
+            'category_id' => 'required'
         ]);
         $file = $request->file('gambar');
         $slug = SlugService::createSlug(Article::class, 'slug', $request->title);
@@ -53,40 +53,38 @@ class ArticleTwoController extends Controller
             if (!Storage::exists('/public/articles2')) {
                 Storage::makeDirectory('public/articles2', 0775, true);
             }
-            $namafile =  $file->hashName();
+            $namafile = $file->hashName();
             $img = Image::make($file->path());
             $img->resize(1080, null, function ($constraint) {
                 $constraint->aspectRatio();
             });
             $img->save(Storage::path('public/articles2/' . $namafile));
         }
-        $save=Article::create([
-            'title'=>$request->title,
-            'slug'=>$slug,
-            'category_id'=>$request->category_id,
-            'penulis'=>$request->penulis,
-            'body'=>$request->isi,
-            'article_number'=>2,
-            'gambar'=>$namafile
+        $save = Article::create([
+            'title' => $request->title,
+            'slug' => $slug,
+            'category_id' => $request->category_id,
+            'penulis' => $request->penulis,
+            'body' => $request->isi,
+            'article_number' => 2,
+            'gambar' => $namafile
         ]);
-        if($save){
-            return redirect()->route('articles2.index')->with('success','Data berhasil ditambahkan');
-        }else{
-            return redirect()->route('articles2.index')->with('failed','Data gagal ditambahkan');
+        if ($save) {
+            return redirect()->route('articles2.index')->with('success', 'Data berhasil ditambahkan');
+        } else {
+            return redirect()->route('articles2.index')->with('failed', 'Data gagal ditambahkan');
 
         }
 
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Article $article)
     {
         $data = [
             'title' => 'Detail Article',
             'posts' => $article->load('category'),
-            'categories'=>Category::get()
+            'categories' => Category::get()
         ];
 
         return view('admin.articles2.details', $data);
@@ -98,10 +96,10 @@ class ArticleTwoController extends Controller
     public function update(Request $request, Article $article)
     {
         $request->validate([
-            'title'=>'required',
-            'isi'=>'required',
-            'penulis'=>'required',
-            'gambar'=>'image|mimes:jpg,png,bmp,jpeg,webp'
+            'title' => 'required',
+            'isi' => 'required',
+            'penulis' => 'required',
+            'gambar' => 'image|mimes:jpg,png,bmp,jpeg,webp'
         ]);
         $file = $request->file('gambar');
         $slug = SlugService::createSlug(Article::class, 'slug', $request->title);
@@ -111,7 +109,7 @@ class ArticleTwoController extends Controller
             if (!Storage::exists('/public/articles2')) {
                 Storage::makeDirectory('public/articles2', 0775, true);
             }
-            $namafile =  $file->hashName();
+            $namafile = $file->hashName();
             $img = Image::make($file->path());
             $img->resize(1080, null, function ($constraint) {
                 $constraint->aspectRatio();
@@ -119,19 +117,19 @@ class ArticleTwoController extends Controller
             Storage::delete('public/articles2/' . $article->image);
             $img->save(Storage::path('public/articles2/' . $namafile));
         }
-        $update=Article::where('id',$article->id)->update([
-            'title'=>$request->title,
-            'slug'=>$slug,
-            'penulis'=>$request->penulis,
-            'category_id'=>$request->category_id,
-            'body'=>$request->isi,
-            'article_number'=>2,
-            'gambar'=>$namafile
+        $update = Article::where('id', $article->id)->update([
+            'title' => $request->title,
+            'slug' => $slug,
+            'penulis' => $request->penulis,
+            'category_id' => $request->category_id,
+            'body' => $request->isi,
+            'article_number' => 2,
+            'gambar' => $namafile
         ]);
-        if($update){
-            return redirect()->route('articles2.index')->with('success','Data berhasil diupdate');
-        }else{
-            return redirect()->route('articles2.index')->with('failed','Data gagal diupdate');
+        if ($update) {
+            return redirect()->route('articles2.index')->with('success', 'Data berhasil diupdate');
+        } else {
+            return redirect()->route('articles2.index')->with('failed', 'Data gagal diupdate');
 
         }
     }

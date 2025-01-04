@@ -8,39 +8,46 @@
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-md-12">
-                @if (session()->get('errors'))
+                {{-- Error Alert --}}
+                @if ($errors->any())
                     <div class="alert alert-danger fade show text-white" role="alert">
                         @foreach ($errors->all() as $error)
-                            <span class="alert-text">* {{ $error }}</span> <br>
+                            <span class="alert-text">* {{ $error }}</span><br>
                         @endforeach
                     </div>
                 @endif
+
+                {{-- Success/Failure Alert --}}
+                @if (session()->has('success'))
+                    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                        <span class="text-white">{{ session('success') }}</span>
+                        <button type="button" class="btn-close text-white" data-bs-dismiss="alert"
+                            aria-label="Close">X</button>
+                    </div>
+                @elseif(session()->has('failed'))
+                    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                        <span class="text-white">{{ session('failed') }}</span>
+                        <button type="button" class="btn-close text-white" data-bs-dismiss="alert"
+                            aria-label="Close">X</button>
+                    </div>
+                @endif
+
+                {{-- Form --}}
                 <div class="card mb-2">
-                    @if (session()->has('success'))
-                        <div class="alert alert-success mt-2 alert-dismissible fade show" role="alert">
-                            <span class="text-white">{{ session()->get('success') }}</span>
-                            <button type="button" class="btn-close text-white" data-bs-dismiss="alert"
-                                aria-label="Close">X</button>
-                        </div>
-                    @elseif(session()->has('failed'))
-                        <div class="alert alert-danger mt-2 alert-dismissible fade show" role="alert">
-                            <span class="text-white">{{ session()->get('failed') }}</span>
-                            <button type="button" class="btn-close text-white" data-bs-dismiss="alert"
-                                aria-label="Close">X</button>
-                        </div>
-                    @endif
                     <div class="card-header">
                         <h5>{{ $title }}</h5>
                     </div>
-                    <div class="card-body px-2 pt-0 pb-2 p-4">
-                        <form action="{{ route('articles2.store') }}" class="px-4" method="post"
-                            enctype="multipart/form-data">
+                    <div class="card-body px-4 pt-0 pb-2">
+                        <form action="{{ route('articles.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
+                            {{-- Title --}}
                             <div class="form-group">
                                 <label for="title">Judul</label>
-                                <input type="text" class="form-control" name="title" id="title"
+                                <input type="text" name="title" id="title" class="form-control"
                                     placeholder="Input title">
                             </div>
+
+                            {{-- Category --}}
                             <div class="form-group">
                                 <label for="category_id">Kategori</label>
                                 <select name="category_id" id="category_id" class="form-control">
@@ -50,30 +57,36 @@
                                     @endforeach
                                 </select>
                             </div>
+
+                            {{-- Author --}}
                             <div class="form-group">
                                 <label for="penulis">Penulis</label>
-                                <input type="text" class="form-control" name="penulis" id="penulis"
+                                <input type="text" name="penulis" id="penulis" class="form-control"
                                     placeholder="Input penulis">
                             </div>
+
+                            {{-- Body --}}
                             <div class="form-group mb-4">
                                 <label for="isi">Body</label>
                                 <textarea name="isi" id="isi" class="form-control" cols="10" rows="5"></textarea>
                             </div>
+
+                            {{-- Image Upload --}}
                             <div class="row mb-2">
                                 <div class="col-md-3">
                                     <img id="previewImg" alt="PreviewImg" height="300" width="300"
                                         class="img-thumbnail">
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="custom-file mb-2">
-                                        <input type="file" class="form-control form-control-alternative" name="gambar"
-                                            id="image" placeholder="Input file">
-                                    </div>
+                                    <input type="file" name="gambar" id="image"
+                                        class="form-control form-control-alternative">
                                 </div>
                             </div>
+
+                            {{-- Actions --}}
                             <div class="form-group">
                                 <button class="btn btn-success" type="submit">Save</button>
-                                <a href="{{ route('articles2.index') }}" class="btn btn-danger">Batal</a>
+                                <a href="{{ route('articles.index') }}" class="btn btn-danger">Batal</a>
                             </div>
                         </form>
                     </div>
@@ -81,12 +94,9 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('datatables-js')
-    <script src="https://cdn.ckeditor.com/ckeditor5/43.1.1/ckeditor5.umd.js"></script>
-
     <script>
         const {
             ClassicEditor,
@@ -97,16 +107,13 @@
             Paragraph
         } = CKEDITOR;
 
-        ClassicEditor
-            .create(document.querySelector('#isi'), {
-                plugins: [Essentials, Bold, Italic, Font, Paragraph],
-                toolbar: [
-                    'undo', 'redo', '|', 'bold', 'italic', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
-                ]
-            })
-            .then( /* ... */ )
-            .catch( /* ... */ );
+        ClassicEditor.create(document.querySelector('#isi'), {
+            plugins: [Essentials, Bold, Italic, Font, Paragraph],
+            toolbar: [
+                'undo', 'redo', '|', 'bold', 'italic', '|',
+                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
+            ]
+        }).catch(error => console.error(error));
     </script>
-    <script src="{{ asset('assets/admin/assets/js/custom-js/custom-plugins.js') }}"></script>
+    <script src="{{ asset('assets/admin/assets/js/custom-js/custom-plugins.js') }}" defer></script>
 @endsection
