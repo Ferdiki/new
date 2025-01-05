@@ -1,10 +1,16 @@
 @extends('layouts.main-admin')
 
-{{-- {{ asset('storage/posts') }}/{{$posts->image}} --}}
 @section('content-admin')
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-md-12">
+                @if (session()->get('errors'))
+                    <div class="alert alert-danger fade show text-white" role="alert">
+                        @foreach ($errors->all() as $error)
+                            <span class="alert-text">* {{ $error }}</span> <br>
+                        @endforeach
+                    </div>
+                @endif
                 <div class="card mb-2">
                     @if (session()->has('success'))
                         <div class="alert alert-success mt-2 alert-dismissible fade show" role="alert">
@@ -21,38 +27,57 @@
                     @endif
                     <div class="card-header d-flex justify-content-between">
                         <h5>{{ $title }}</h5>
-                        <a href="{{ route('galleries.create') }}" class="btn btn-primary mb-2">Tambah</a>
+                        <a href="{{ route('articles2.create') }}" class="btn btn-success">Add article</a>
                     </div>
-
-                    <div class="card-body">
-                        <div class="row">
-                            @foreach ($galleries as $item)
-                                <div class="col-md-3">
-                                    <div class="card" style="width: 18rem;">
-                                        @if ($item->gallery != 'default')
-                                            <img class="card-img-top"
-                                                src="{{ asset('storage/galleries') }}/{{ $item->gallery }}"
-                                                alt="Gallery web">
-                                        @else
-                                            <img class="card-img-top" src="https://dummyimage.com/1080x800/a1a1a1/000000"
-                                                alt="Gallery web">
-                                        @endif
-                                        <div class="card-body">
-                                            <form action="{{ route('galleries.destroy', ['gallery' => $item->id]) }}"
-                                                method="post">
-                                                @method('DELETE')
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger"><i
-                                                        class="fas fa-trash-alt">Delete</i></button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                    <div class="card-body px-2 pt-0 pb-2">
+                        <div class="table-responsive pb-0">
+                            <table class="table table-striped">
+                                <thead class="text-center">
+                                    <th>No</th>
+                                    <th>Title</th>
+                                    <th>#</th>
+                                </thead>
+                                <tbody>
+                                    @forelse ($galleries as $item)
+                                        <tr class="text-center">
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td><a href="{{ route('gallery.show', ['gallery' => $item->id]) }}"
+                                                    class="fs-6 fw-medium text-success">{{ $item->title }} <i
+                                                        class="fa fa-pencil"></i></a></td>
+                                            <td class="align-middle">
+                                                <button
+                                                    class="btn btn-link text-secondary mb-0 rounded-circle bg-light text-dark"
+                                                    id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    <i class="fa fa-ellipsis-v text-md"></i>
+                                                </button>
+                                                <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
+                                                    <li>
+                                                        <form
+                                                            action="{{ route('articles.destroy', ['article' => $item->id]) }}"
+                                                            method="post">
+                                                            @method('delete')
+                                                            @csrf
+                                                            <button class="dropdown-item text-white" type="submit"><i
+                                                                    class="fa fa-trash text-danger"></i>
+                                                                Delete</button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr class="text-center">
+                                            <td colspan="3">Empty Data</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
